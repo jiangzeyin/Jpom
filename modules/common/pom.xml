@@ -1,33 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>jpom-parent</artifactId>
-        <groupId>io.jpom</groupId>
-        <version>2.5.2</version>
-        <relativePath>../../pom.xml</relativePath>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <name>Jpom 公共模块</name>
-    <artifactId>common</artifactId>
-    <version>2.5.2</version>
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>jpom-parent</artifactId>
+		<groupId>io.jpom</groupId>
+		<version>2.5.2</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<name>Jpom 公共模块</name>
+	<artifactId>common</artifactId>
+	<version>2.5.2</version>
 
-    <dependencies>
-<!--        &lt;!&ndash;  文件编码识别&ndash;&gt;-->
-        <!--        <dependency>-->
-        <!--            <groupId>net.sourceforge.jchardet</groupId>-->
-        <!--            <artifactId>jchardet</artifactId>-->
-        <!--            <version>1.0</version>-->
-        <!--        </dependency>-->
-    </dependencies>
+	<dependencies>
+		<!--  文件编码识别-->
+		<dependency>
+			<groupId>net.sourceforge.jchardet</groupId>
+			<artifactId>jchardet</artifactId>
+			<version>1.0</version>
+		</dependency>
 
-    <profiles>
-        <profile>
-            <id>release-plugin-profile</id>
-        </profile>
-        <profile>
-            <id>install-plugin-profile</id>
-        </profile>
-    </profiles>
+		<!-- https://mvnrepository.com/artifact/com.googlecode.juniversalchardet/juniversalchardet -->
+		<dependency>
+			<groupId>com.googlecode.juniversalchardet</groupId>
+			<artifactId>juniversalchardet</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>release-plugin-profile</id>
+		</profile>
+		<profile>
+			<id>install-plugin-profile</id>
+		</profile>
+	</profiles>
 </project>

@@ -18,10 +18,24 @@
  */
 package com.ruoyi.parser;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.StrUtil;
+import io.jpom.util.CharsetDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.util.Arrays;
 import java.util.BitSet;
 
 /**
@@ -37,15 +51,103 @@ import java.util.BitSet;
 public class CodeDetector {
 	private static Logger logger = LoggerFactory.getLogger(CodeDetector.class);
 
-	private static int BYTE_SIZE = 8;
+
 	public static String CODE_UTF8 = "UTF-8";
 	public static String CODE_UTF8_BOM = "UTF-8_BOM";
 	public static String CODE_GBK = "GBK";
 
 	public static void main(String[] args) throws Exception {
-		File file = new File("D:\\SystemDir\\桌面\\jpom-2.5.0.tar.gz");
-		System.out.println(getEncode(file.getAbsolutePath(), true));
-		System.out.println(getEncode("D:\\SystemDir\\桌面\\gitlab2gitee_temp_list2.txt", true));
+		//File file = new File("D:\\SystemDir\\桌面\\jpom-2.5.0.tar.gz");
+		//System.out.println(getEncode(file.getAbsolutePath(), true));
+		//System.out.println(detect(new FileInputStream("D:\\Idea\\Jpom\\modules\\common\\src\\test\\resources\\test.bat")));
+		//System.out.println(getEncode("D:\\SystemDir\\Desktop\\新建文本文档 (2).zip", true));
+		CharsetDetector charsetDetector = new CharsetDetector();
+		//System.out.println(charsetDetector.detectChineseCharset(new File("D:\\\\SystemDir\\\\Desktop\\\\新建文本文档 (2).zip")));
+
+		charsetDetector.universalDetect(new FileInputStream("D:\\\\SystemDir\\\\Desktop\\\\新建文本文档 (2).zip"));
+		System.out.println("sss");
+		charsetDetector.universalDetect(new FileInputStream("D:\\Idea\\Jpom\\modules\\common\\src\\test\\resources\\test.bat"));
+
+		//CharsetDetector charsetDetector = new CharsetDetector();
+//		File file = new File("D:\\Idea\\Jpom\\modules\\common\\src\\test\\resources\\test.bat");
+//		System.out.println(charsetDetector.detectChineseCharset(file));
+//		System.out.println(FileUtil.readString(file,CharsetUtil.charset("GB18030")));
+	}
+
+	private static final Charset[] DEFAULT_CHARSETS;
+
+	private static final int BYTE_SIZE = 8;
+
+	static {
+		String[] names = {
+				"UTF-8",
+				"GBK",
+				"GB2312",
+				"GB18030",
+				"UTF-16BE",
+				"UTF-16LE",
+				"UTF-16",
+				"BIG5",
+				"UNICODE",
+				"US-ASCII"};
+		DEFAULT_CHARSETS = Convert.convert(Charset[].class, names);
+	}
+
+	/**
+	 * 探测编码<br>
+	 * 注意：此方法会读取流的一部分，然后关闭流，如重复使用流，请使用使用支持reset方法的流
+	 *
+	 * @param in       流，使用后关闭此流
+	 * @param charsets 需要测试用的编码，null或空使用默认的编码数组
+	 * @return 编码
+	 */
+	public static Charset detect(InputStream in, Charset... charsets) {
+		if (ArrayUtil.isEmpty(charsets)) {
+			charsets = DEFAULT_CHARSETS;
+		}
+
+		final byte[] buffer = new byte[512];
+		try {
+			int len;
+			while ((len = in.read(buffer)) > -1) {
+				byte[] bufferBytes = (byte[]) ArrayUtil.copy(buffer, 0, new byte[len], 0, len);
+				for (Charset charset : charsets) {
+					System.out.println(charset + "   -----------------");
+					final CharsetDecoder decoder = charset.newDecoder();
+					if (identify(bufferBytes, decoder, charset)) {
+						return charset;
+					}
+				}
+			}
+		} catch (IOException e) {
+			throw new IORuntimeException(e);
+		} finally {
+			IoUtil.close(in);
+		}
+		return null;
+	}
+
+	/**
+	 * 通过try的方式测试指定bytes是否可以被解码，从而判断是否为指定编码
+	 *
+	 * @param bytes   测试的bytes
+	 * @param decoder 解码器
+	 * @return 是否是指定编码
+	 */
+	private static boolean identify(byte[] bytes, CharsetDecoder decoder, Charset charset) {
+		try {
+			CharBuffer decode = decoder.decode(ByteBuffer.wrap(bytes));
+			char[] array = decode.array();
+			String toString = decode.toString();
+			String s = new String(bytes, charset);
+			System.out.println(bytes.length + "  " + decode.length() + "  " + toString + "  " + s);
+
+			return StrUtil.equals(toString, s);
+		} catch (CharacterCodingException e) {
+			//e.printStackTrace();
+			return false;
+		}
+//		return true;
 	}
 
 	/**
@@ -91,6 +193,7 @@ public class CodeDetector {
 			} else {
 				encodeType = CODE_GBK;
 			}
+			System.out.println(Arrays.toString(head));
 			logger.info("result encode type : " + encodeType);
 		} catch (Exception e) {
 			// TODO: handle exception
