@@ -58,7 +58,7 @@
         <tomcat.version>9.0.90</tomcat.version>
         <yaml.version>2.2</yaml.version>
         <!--  h2 不能直接升级 The write format 2 is smaller than the supported format 3-->
-        <h2.version>2.1.214</h2.version>
+        <h2.version>2.2.220</h2.version>
         <postgresql.version>42.3.10</postgresql.version>
         <logback.version>1.2.13</logback.version>
         <mysql.version>8.2.0</mysql.version>
